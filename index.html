@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SAYAK DUTTA</title>
-  <meta name="description" content="Sayak Dutta — AI/ML engineer focused on LLM agents, robust RAG, and real-time analytics pipelines." />
+  <meta name="description" content="Sayak Dutta — AI/ML Engineer | Expert in LLM agents, reliable RAG, and real-time analytics | Builds production-grade systems with proven reliability, real-world performance, and seamless scaling." />
   <style>
     :root{
       --bg:#000; --fg:#e6edf3; --muted:#8b949e;
@@ -12,12 +12,10 @@
       --gap:22px;
       --font: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
     }
-    /* Light mode only when explicitly toggled */
     [data-theme="light"]{
       --bg:#ffffff; --fg:#0b0c0f; --muted:#66707b;
       --green:#0fa968; --blue:#1f6feb; --cyan:#0ea5e9;
     }
-
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
@@ -66,23 +64,22 @@
   </main>
 
   <script>
-    /* ===== Theme toggle (persisted) ===== */
+    /* ===== Theme toggle (persisted, default dark) ===== */
     const root = document.documentElement;
     const themeBtn = document.getElementById('themeToggle');
-    const saved = localStorage.getItem('theme'); // "light" | "dark"
-    if (saved === 'light') root.setAttribute('data-theme','light'); // default stays dark
+    const savedTheme = localStorage.getItem('theme'); // "light" | "dark"
+    if (savedTheme === 'light') root.setAttribute('data-theme','light'); // default stays dark
     themeBtn.textContent = root.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
     themeBtn.onclick = () => {
-      const isLight = root.getAttribute('data-theme') === 'light';
-      if (isLight) { root.removeAttribute('data-theme'); localStorage.setItem('theme','dark'); themeBtn.textContent='☀️'; }
+      const light = root.getAttribute('data-theme') === 'light';
+      if (light) { root.removeAttribute('data-theme'); localStorage.setItem('theme','dark'); themeBtn.textContent='☀️'; }
       else { root.setAttribute('data-theme','light'); localStorage.setItem('theme','light'); themeBtn.textContent='🌙'; }
     };
 
-    /* ===== Content (no first person) ===== */
+    /* ===== Content (third-person, punchy) ===== */
     const LINES = [
       `<span class="prompt">sayak:~$</span> <span class="cmd">cat about_me.txt</span>`,
-      `AI/ML engineer specializing in LLM agents, robust RAG, and real-time analytics pipelines.`,
-      `Delivers production-grade systems with clear evals, tracing, and tight feedback loops.`,
+      `AI/ML Engineer | Expert in LLM agents, reliable RAG, and real-time analytics | Builds production-grade systems with proven reliability, real-world performance, and seamless scaling`,
       ``,
       ``,
 
@@ -120,41 +117,44 @@
       `<span class="prompt">sayak:~$</span> <span class="cmd">exit</span>`
     ];
 
-    /* ===== Typewriter: fast, no jank, tab-switch safe ===== */
+    /* ===== Typewriter: tab-switch safe & de-duplicated gaps ===== */
     const screen = document.getElementById('screen');
     const cursor = document.createElement('span'); cursor.className = 'cursor';
-    let li = 0, ci = 0, lineEl = null, running = true;
+    let li = 0, ci = 0, lineEl = null, running = true, timerId = null;
 
     function addGapIfSection(lineStr){
+      // only one gap before a section header block
       if (lineStr.includes('cat projects.txt') || lineStr.includes('cat skills_and_interests.txt') || lineStr.includes('cat links.txt')) {
-        const gap = document.createElement('div'); gap.className = 'gap'; screen.appendChild(gap);
+        const last = screen.lastElementChild;
+        if (!last || !last.classList || !last.classList.contains('gap')) {
+          const gap = document.createElement('div'); gap.className = 'gap'; screen.appendChild(gap);
+        }
       }
     }
 
-    function finishCurrentLineHTML(lineStr) {
-      if (!lineEl) return;
-      lineEl.innerHTML = lineStr; // replace partial text with full HTML line
-    }
+    function finishLineHTML(lineStr){ if (lineEl) lineEl.innerHTML = lineStr; }
 
-    function flushRemaining() {
-      // Complete current line, then render the rest instantly
-      if (li < LINES.length) {
-        finishCurrentLineHTML(LINES[li]);
-        li++;
-      }
+    function clearTimer(){ if (timerId){ clearTimeout(timerId); timerId = null; } }
+
+    function flushRemaining(){
+      if (!running) return;
+      clearTimer();
+      // complete current line
+      if (li < LINES.length) { finishLineHTML(LINES[li]); li++; }
+      // render the rest instantly with proper gaps
       const frag = document.createDocumentFragment();
       for (; li < LINES.length; li++){
-        addGapIfSection(LINES[li]);
-        const d = document.createElement('div');
-        d.innerHTML = LINES[li];
-        frag.appendChild(d);
+        const s = LINES[li];
+        if (s.includes('cat projects.txt') || s.includes('cat skills_and_interests.txt') || s.includes('cat links.txt')) {
+          const g = document.createElement('div'); g.className = 'gap'; frag.appendChild(g);
+        }
+        const d = document.createElement('div'); d.innerHTML = s; frag.appendChild(d);
       }
       screen.appendChild(frag);
       screen.appendChild(cursor);
       running = false;
     }
 
-    // If user switches tabs, instantly finish rendering
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && running) flushRemaining();
     });
@@ -184,12 +184,11 @@
       ci++;
       const speed = 16 + Math.random()*34;
       if (ci < plain.length){
-        setTimeout(tick, speed);
+        timerId = setTimeout(tick, speed);
       } else {
-        // swap to HTML once line finishes
         if (hasHTML) lineEl.innerHTML = line;
         li++; ci = 0; lineEl = null;
-        setTimeout(tick, 260);
+        timerId = setTimeout(tick, 240);
       }
     }
     tick();
