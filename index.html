@@ -3,92 +3,101 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sayak Dutta — AI/ML Engineer</title>
-  <meta name="description" content="Sayak Dutta — AI/ML Engineer building LLM agents, RAG systems, and real-time analytics pipelines." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>λ</text></svg>">
+  <title>SAYAK DUTTA</title>
+  <meta name="description" content="Sayak Dutta — AI/ML Engineer. LLM agents, RAG systems, real-time analytics." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>_</text></svg>">
   <style>
+    /* ===== Base (pure black, terminal look) ===== */
     :root{
-      --bg:#0b0c0f; --fg:#e6edf3; --muted:#9aa4ae; --green:#00d084; --blue:#6ea8ff; --line:#23262b; --maxw:940px;
-    }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#ffffff; --fg:#0b0c0f; --muted:#66707b; --green:#0ca678; --blue:#1f6feb; --line:#d0d7de; }
+      --bg:#000; --fg:#e6edf3; --muted:#8b949e; --green:#22c55e; --link:#58a6ff;
+      --maxw:980px;
     }
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
       margin:0; background:var(--bg); color:var(--fg);
       font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
-    .wrap{
+
+    /* ===== Layout: top-left like a real shell ===== */
+    .stage{
       min-height:100%;
-      display:grid; place-items:start center;
-      padding:6vh 6vw;
+      display:block;
+      padding:32px 22px 80px;
     }
-    .terminal{
-      width:100%; max-width:var(--maxw);
-      border-radius:14px; background:#00000088; backdrop-filter:saturate(1.05) blur(4px);
-      border:1px solid var(--line); padding:22px;
-      box-shadow:0 10px 30px #00000055;
+    .title{
+      margin:0 0 14px;
+      font-weight:800; letter-spacing:.06em;
     }
-    .title{ font-weight:700; letter-spacing:.04em; margin:0 0 10px; }
+    #screen{ margin:0; white-space:pre-wrap }
+
+    /* ===== Terminal colors ===== */
     .prompt{ color:var(--green) }
     .path{ color:var(--muted) }
-    a{ color:var(--blue); text-decoration:none; border-bottom:1px dotted currentColor }
+    a{ color:var(--link); text-decoration:none; border-bottom:1px dotted currentColor }
     a:hover{ border-bottom-style:solid }
+
+    /* ===== Cursor ===== */
     .cursor{
-      display:inline-block; width:.6ch; height:1.1em; vertical-align:-0.15em;
+      display:inline-block; width:.6ch; height:1.15em; vertical-align:-0.15em;
       background:var(--fg); margin-left:2px; animation:blink 1s steps(1,end) infinite;
     }
     @keyframes blink{ 50%{ opacity:0 } }
-    @media (max-width:600px){
-      .terminal{ padding:18px }
-      .title{ font-size:16px }
+
+    /* ===== Responsiveness ===== */
+    @media (min-width:1100px){
+      .stage{ padding-left:8vw; }
+      .title{ font-size:22px }
+      body{ font-size:17px }
     }
-    footer{
-      max-width:var(--maxw); width:100%; margin:18px auto 0; color:var(--muted);
-      font-size:12px; text-align:center;
+    @media (max-width:520px){
+      body{ font-size:15px }
+      .stage{ padding:24px 16px }
     }
+
+    /* subtle selection so it still feels terminal-y */
+    ::selection{ background:#1f6feb33 }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="terminal" aria-label="Terminal window">
-      <h1 class="title">SAYAK DUTTA</h1>
-      <pre id="screen" aria-live="polite" aria-atomic="false"></pre>
-    </section>
-    <footer>© <span id="y"></span> Sayak Dutta • <a href="mailto:sduttan598@gmail.com">sduttan598@gmail.com</a></footer>
+  <main class="stage" aria-label="terminal">
+    <h1 class="title">SAYAK DUTTA</h1>
+    <pre id="screen" aria-live="polite" aria-atomic="false"></pre>
   </main>
 
   <script>
-    // --- Edit only the content below to update your page ---
+    // Replace lines here to edit content
     const lines = [
-      `<span class="prompt">sayak@site</span>:<span class="path">~/about</span>$ cat profile.txt`,
-      `AI/ML Engineer — I build LLM agents, solid RAG, and real-time analytics pipelines.`,
+      `<span class="prompt">sayak@site</span>:<span class="path">~</span>$ cat about_me.txt`,
+      `AI/ML Engineer. I build LLM agents, reliable RAG, and real-time analytics pipelines.`,
+      `I like shipping useful systems with clean evals, tracing, and crisp UX.`,
       ``,
-      `<span class="prompt">sayak@site</span>:<span class="path">~/projects</span>$ ls -l`,
-      `📂 OutreachPilot    → Agent that generates, A/B tests, and optimizes outreach automatically`,
-      `📂 ResearchRAG      → Paste a paper link → key insights, pros/cons, chat grounded to source`,
-      `📂 TalkToTube       → YouTube → transcript, clean summary, and Q&A`,
-      `📂 FinSentiment     → News/filings → market sentiment & risk signals in real time`,
-      `📂 TradingPipeline  → Low-latency market data + Python analytics (Rust/C++ where it counts)`,
+
+      `<span class="prompt">sayak@site</span>:<span class="path">~/highlights</span>$ ls -l`,
+      `📁 OutreachPilot    → Agent that generates, A/B tests, and optimizes outreach automatically`,
+      `📁 ResearchRAG      → Paste a paper → key insights, pros/cons, and grounded chat`,
+      `📁 TalkToTube       → YouTube → transcript, clean summary, and Q&A`,
+      `📁 FinSentiment     → News/filings → market sentiment & risk signals in real time`,
+      `📁 TradingPipeline  → Low-latency market data + Python analytics (Rust/C++ where it counts)`,
       ``,
-      `<span class="prompt">sayak@site</span>:<span class="path">~/stack</span>$ cat skills.txt`,
-      `Languages: Python • Rust/C++`,
-      `Tooling: Linux • Docker • CI/CD • CUDA (basics)`,
-      `Focus: Agent orchestration • Retrieval & embeddings • Vector DBs • NLP`,
+
+      `<span class="prompt">sayak@site</span>:<span class="path">~/cred</span>$ cat notes.txt`,
+      `HackaTUM 2023 participant`,
+      `Python • Rust/C++ • Linux • Docker • CI/CD • CUDA (basics)`,
+      `Retrieval & embeddings • Vector DBs • Agent orchestration • NLP`,
       ``,
-      `<span class="prompt">sayak@site</span>:<span class="path">~/now</span>$ cat status.txt`,
-      `Open to: AI/ML Engineer • AI Research Engineer • LLM/Agent Engineer`,
-      `Location: London (relocation-ready) • Remote OK`,
-      `Goal: Ship useful systems with clear metrics, tight feedback loops, and clean ops`,
-      ``,
+
       `<span class="prompt">sayak@site</span>:<span class="path">~/links</span>$ open links.html`,
       `GitHub   → <a href="https://github.com/sayakdutta" target="_blank" rel="noopener">github.com/sayakdutta</a>`,
       `LinkedIn → <a href="https://www.linkedin.com/in/sayak-dutta" target="_blank" rel="noopener">linkedin.com/in/sayak-dutta</a>`,
-      `Email    → <a href="mailto:sduttan598@gmail.com">sduttan598@gmail.com</a>`,
-    ];
-    // -------------------------------------------------------
+      ``,
 
+      `<span class="prompt">sayak@site</span>:<span class="path">~/now</span>$ echo "shipping"`,
+      `latest → agentic workflows with evals, tracing, and autoscaling retrieval`
+    ];
+
+    // --- Typewriter engine (HTML-safe lines) ---
     const screen = document.getElementById("screen");
     const cursor = document.createElement("span"); cursor.className = "cursor";
     let l = 0, i = 0;
@@ -119,11 +128,10 @@
       }else{
         if(isHTML) lineEl.innerHTML = current;
         l++; i = 0;
-        setTimeout(typeNext, 350);
+        setTimeout(typeNext, 320);
       }
     }
     typeNext();
-    document.getElementById("y").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
