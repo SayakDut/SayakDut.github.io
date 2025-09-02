@@ -6,22 +6,19 @@
   <title>SAYAK DUTTA</title>
   <meta name="description" content="Sayak Dutta — AI/ML Engineer. I build LLM agents, reliable RAG, and real-time analytics pipelines." />
   <style>
-    /* ========= THEME TOKENS ========= */
+    /* ========== THEME (default: DARK) ========== */
     :root{
       --bg:#000; --fg:#e6edf3; --muted:#8b949e;
-      --green:#22c55e; --blue:#58a6ff; --cyan:#79c0ff; --orange:#ffbc6f; --pink:#ff8bd1;
+      --green:#22c55e; --blue:#58a6ff; --cyan:#79c0ff;
       --section-gap:22px;
       --font: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
     }
+    /* Light mode only when [data-theme="light"] is set */
     [data-theme="light"]{
-      --bg:#fff; --fg:#0b0c0f; --muted:#66707b;
-      --green:#0fa968; --blue:#1f6feb; --cyan:#0ea5e9; --orange:#d97706; --pink:#db2777;
-    }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#fff; --fg:#0b0c0f; --muted:#66707b; --green:#0fa968; --blue:#1f6feb; --cyan:#0ea5e9; --orange:#d97706; --pink:#db2777; }
+      --bg:#ffffff; --fg:#0b0c0f; --muted:#66707b;
+      --green:#0fa968; --blue:#1f6feb; --cyan:#0ea5e9;
     }
 
-    /* ========= BASE ========= */
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
@@ -30,46 +27,40 @@
       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
     .wrap{
-      min-height:100%;
-      display:grid; place-items:start center;
+      min-height:100%; display:grid; place-items:start center;
       padding:28px 16px 56px;
     }
-    .term{
-      width:100%; max-width:940px;
-    }
+    .term{ width:100%; max-width:940px; }
     h1{ margin:0 0 12px; letter-spacing:.06em }
 
     #screen{ margin:0; white-space:pre-wrap }
     .prompt{ color:var(--green) }
     .path{ color:var(--muted) }
-    .cmd   { color:var(--cyan) }
+    .cmd { color:var(--cyan) }
     a{ color:var(--blue); text-decoration:none; border-bottom:1px dotted currentColor }
     a:hover{ border-bottom-style:solid }
 
-    /* spacing blocks like the reference site */
     .gap{ height:var(--section-gap) }
 
-    /* cursor */
     .cursor{
       display:inline-block; width:.6ch; height:1.15em; vertical-align:-0.15em;
       background:var(--fg); margin-left:2px; animation:blink 1s steps(1,end) infinite;
     }
     @keyframes blink{ 50%{ opacity:0 } }
 
-    /* top-right toggle */
     .tog{
       position:fixed; top:16px; right:16px;
       border:1px solid currentColor; border-radius:10px;
       font:14px var(--font); padding:6px 10px; background:transparent; color:var(--fg);
-      cursor:pointer; opacity:.8;
+      cursor:pointer; opacity:.85;
     }
     .tog:hover{ opacity:1 }
-
     @media (max-width:560px){ body{ font-size:15px } }
   </style>
 </head>
 <body>
-  <button id="themeToggle" class="tog" aria-label="Toggle theme">☀️/🌙</button>
+  <!-- theme toggle -->
+  <button id="themeToggle" class="tog" aria-label="Toggle theme">☀️</button>
 
   <main class="wrap">
     <section class="term" aria-label="Terminal">
@@ -79,21 +70,19 @@
   </main>
 
   <script>
-    // ========== THEME TOGGLE ==========
+    // ===== Theme toggle (default dark) =====
     const root = document.documentElement;
-    const btn  = document.getElementById('themeToggle');
-    const stored = localStorage.getItem('theme');
-    if(stored) root.setAttribute('data-theme', stored);
-    btn.textContent = root.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
-    btn.onclick = () => {
-      const cur = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      if(cur === 'dark') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', cur);
-      btn.textContent = cur === 'light' ? '🌙' : '☀️';
+    const themeBtn = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('theme'); // "light" or "dark"
+    if (savedTheme === 'light') root.setAttribute('data-theme','light'); // default stays dark if not set
+    themeBtn.textContent = root.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
+    themeBtn.onclick = () => {
+      const isLight = root.getAttribute('data-theme') === 'light';
+      if (isLight) { root.removeAttribute('data-theme'); localStorage.setItem('theme','dark'); themeBtn.textContent='☀️'; }
+      else { root.setAttribute('data-theme','light'); localStorage.setItem('theme','light'); themeBtn.textContent='🌙'; }
     };
 
-    // ========== CONTENT ==========
-    // Distinct emojis per project; generous blank lines to create the same "section gaps"
+    // ===== Content =====
     const lines = [
       `<span class="prompt">sayak:~$</span> <span class="cmd">cat about_me.txt</span>`,
       `AI/ML Engineer. I build LLM agents, reliable RAG, and real-time analytics pipelines.`,
@@ -132,50 +121,66 @@
       ``,
       ``,
 
-      `<span class="prompt">sayak:~$</span> <span class="cmd">cat achievements.txt</span>`,
-      `🏁 HackaTUM 2023 participant`,
-      ``,
-      ``,
-
       `<span class="prompt">sayak:~$</span> <span class="cmd">exit</span>`
     ];
 
-    // ========== TYPEWRITER (fast & minimal reflow) ==========
+    // ===== Typewriter (fast, minimal reflow, tab-switch safe) =====
     const screen = document.getElementById("screen");
     const cursor = document.createElement("span"); cursor.className = "cursor";
-    let l = 0, i = 0, lineEl = null;
+    let l = 0, i = 0, lineEl = null, typing = true;
+
+    function flushAll() {
+      // render remaining lines instantly (used when tab goes hidden)
+      const frag = document.createDocumentFragment();
+      for (; l < lines.length; l++) {
+        const div = document.createElement('div');
+        div.innerHTML = lines[l];
+        frag.appendChild(div);
+        // add extra spacing before sections
+        if (lines[l].includes('cat projects.txt') || lines[l].includes('cat skills_and_interests.txt') || lines[l].includes('cat links.txt')) {
+          const spacer = document.createElement('div'); spacer.className = 'gap'; frag.appendChild(spacer);
+        }
+      }
+      screen.appendChild(frag);
+      screen.appendChild(cursor);
+      typing = false;
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && typing) flushAll(); // if user switches tabs, finish immediately
+    });
 
     function typeNext(){
+      if(!typing) return;
       if(l >= lines.length){
-        if(!screen.lastChild || !screen.lastChild.classList || !screen.lastChild.classList.contains('cursor')) screen.append(cursor);
+        if(!screen.lastChild?.classList?.contains('cursor')) screen.append(cursor);
         return;
       }
+
       const current = lines[l];
       const isHTML = current.indexOf("<") !== -1;
 
       if(i === 0){
-        // Insert a "gap" element before certain sections to mimic the reference spacing
-        if(current.includes('cat projects.txt') || current.includes('cat skills_and_interests.txt') || current.includes('cat links.txt') || current.includes('cat achievements.txt')){
+        if(current.includes('cat projects.txt') || current.includes('cat skills_and_interests.txt') || current.includes('cat links.txt')){
           const spacer = document.createElement('div'); spacer.className = 'gap'; screen.append(spacer);
         }
         lineEl = document.createElement("div");
         screen.append(lineEl);
       }
 
-      // Type as plaintext, then swap to HTML when done (avoids layout thrash)
       const plain = isHTML ? current.replace(/<[^>]+>/g,'') : current;
       lineEl.textContent = plain.slice(0, i+1);
 
       if(cursor.parentNode !== screen) screen.append(cursor);
 
       i++;
-      const speed = 16 + Math.random()*34; // ~fast, readable
+      const speed = 16 + Math.random()*34;
       if(i < plain.length){
         setTimeout(typeNext, speed);
       }else{
         if(isHTML) lineEl.innerHTML = current;
         l++; i = 0; lineEl = null;
-        setTimeout(typeNext, 300);
+        setTimeout(typeNext, 280);
       }
     }
     typeNext();
