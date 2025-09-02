@@ -4,16 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SAYAK DUTTA</title>
-  <meta name="description" content="Sayak Dutta — AI/ML Engineer. I build LLM agents, reliable RAG, and real-time analytics pipelines." />
+  <meta name="description" content="Sayak Dutta — AI/ML engineer focused on LLM agents, robust RAG, and real-time analytics pipelines." />
   <style>
-    /* ========== THEME (default: DARK) ========== */
     :root{
       --bg:#000; --fg:#e6edf3; --muted:#8b949e;
       --green:#22c55e; --blue:#58a6ff; --cyan:#79c0ff;
-      --section-gap:22px;
+      --gap:22px;
       --font: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
     }
-    /* Light mode only when [data-theme="light"] is set */
+    /* Light mode only when explicitly toggled */
     [data-theme="light"]{
       --bg:#ffffff; --fg:#0b0c0f; --muted:#66707b;
       --green:#0fa968; --blue:#1f6feb; --cyan:#0ea5e9;
@@ -26,21 +25,18 @@
       font:16px/1.6 var(--font);
       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
-    .wrap{
-      min-height:100%; display:grid; place-items:start center;
-      padding:28px 16px 56px;
-    }
+    .wrap{ min-height:100%; display:grid; place-items:start center; padding:28px 16px 56px; }
     .term{ width:100%; max-width:940px; }
     h1{ margin:0 0 12px; letter-spacing:.06em }
 
     #screen{ margin:0; white-space:pre-wrap }
     .prompt{ color:var(--green) }
     .path{ color:var(--muted) }
-    .cmd { color:var(--cyan) }
+    .cmd{ color:var(--cyan) }
     a{ color:var(--blue); text-decoration:none; border-bottom:1px dotted currentColor }
     a:hover{ border-bottom-style:solid }
 
-    .gap{ height:var(--section-gap) }
+    .gap{ height:var(--gap) }
 
     .cursor{
       display:inline-block; width:.6ch; height:1.15em; vertical-align:-0.15em;
@@ -59,7 +55,7 @@
   </style>
 </head>
 <body>
-  <!-- theme toggle -->
+  <!-- Theme toggle (default dark) -->
   <button id="themeToggle" class="tog" aria-label="Toggle theme">☀️</button>
 
   <main class="wrap">
@@ -70,11 +66,11 @@
   </main>
 
   <script>
-    // ===== Theme toggle (default dark) =====
+    /* ===== Theme toggle (persisted) ===== */
     const root = document.documentElement;
     const themeBtn = document.getElementById('themeToggle');
-    const savedTheme = localStorage.getItem('theme'); // "light" or "dark"
-    if (savedTheme === 'light') root.setAttribute('data-theme','light'); // default stays dark if not set
+    const saved = localStorage.getItem('theme'); // "light" | "dark"
+    if (saved === 'light') root.setAttribute('data-theme','light'); // default stays dark
     themeBtn.textContent = root.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
     themeBtn.onclick = () => {
       const isLight = root.getAttribute('data-theme') === 'light';
@@ -82,11 +78,11 @@
       else { root.setAttribute('data-theme','light'); localStorage.setItem('theme','light'); themeBtn.textContent='🌙'; }
     };
 
-    // ===== Content =====
-    const lines = [
+    /* ===== Content (no first person) ===== */
+    const LINES = [
       `<span class="prompt">sayak:~$</span> <span class="cmd">cat about_me.txt</span>`,
-      `AI/ML Engineer. I build LLM agents, reliable RAG, and real-time analytics pipelines.`,
-      `I ship production code with clear evals, tracing, and fast feedback loops.`,
+      `AI/ML engineer specializing in LLM agents, robust RAG, and real-time analytics pipelines.`,
+      `Delivers production-grade systems with clear evals, tracing, and tight feedback loops.`,
       ``,
       ``,
 
@@ -103,7 +99,7 @@
       `   Stack: Python • SQL • LangChain/LlamaIndex • FastAPI`,
       `   Code: <a href="https://github.com/SayakDut/AskPostgres" target="_blank" rel="noopener">github.com/SayakDut/AskPostgres</a>`,
       ``,
-      `🎥 TalkToTube    → Summarizes YouTube via transcript/ASR and lets you query the content`,
+      `🎥 TalkToTube    → Summarizes YouTube via transcript/ASR and enables grounded Q&A`,
       `   Stack: yt-dlp • Whisper • BART • Streamlit`,
       `   Code: <a href="https://github.com/SayakDut/TalkToTube" target="_blank" rel="noopener">github.com/SayakDut/TalkToTube</a>`,
       ``,
@@ -124,66 +120,79 @@
       `<span class="prompt">sayak:~$</span> <span class="cmd">exit</span>`
     ];
 
-    // ===== Typewriter (fast, minimal reflow, tab-switch safe) =====
-    const screen = document.getElementById("screen");
-    const cursor = document.createElement("span"); cursor.className = "cursor";
-    let l = 0, i = 0, lineEl = null, typing = true;
+    /* ===== Typewriter: fast, no jank, tab-switch safe ===== */
+    const screen = document.getElementById('screen');
+    const cursor = document.createElement('span'); cursor.className = 'cursor';
+    let li = 0, ci = 0, lineEl = null, running = true;
 
-    function flushAll() {
-      // render remaining lines instantly (used when tab goes hidden)
+    function addGapIfSection(lineStr){
+      if (lineStr.includes('cat projects.txt') || lineStr.includes('cat skills_and_interests.txt') || lineStr.includes('cat links.txt')) {
+        const gap = document.createElement('div'); gap.className = 'gap'; screen.appendChild(gap);
+      }
+    }
+
+    function finishCurrentLineHTML(lineStr) {
+      if (!lineEl) return;
+      lineEl.innerHTML = lineStr; // replace partial text with full HTML line
+    }
+
+    function flushRemaining() {
+      // Complete current line, then render the rest instantly
+      if (li < LINES.length) {
+        finishCurrentLineHTML(LINES[li]);
+        li++;
+      }
       const frag = document.createDocumentFragment();
-      for (; l < lines.length; l++) {
-        const div = document.createElement('div');
-        div.innerHTML = lines[l];
-        frag.appendChild(div);
-        // add extra spacing before sections
-        if (lines[l].includes('cat projects.txt') || lines[l].includes('cat skills_and_interests.txt') || lines[l].includes('cat links.txt')) {
-          const spacer = document.createElement('div'); spacer.className = 'gap'; frag.appendChild(spacer);
-        }
+      for (; li < LINES.length; li++){
+        addGapIfSection(LINES[li]);
+        const d = document.createElement('div');
+        d.innerHTML = LINES[li];
+        frag.appendChild(d);
       }
       screen.appendChild(frag);
       screen.appendChild(cursor);
-      typing = false;
+      running = false;
     }
 
+    // If user switches tabs, instantly finish rendering
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden && typing) flushAll(); // if user switches tabs, finish immediately
+      if (document.hidden && running) flushRemaining();
     });
 
-    function typeNext(){
-      if(!typing) return;
-      if(l >= lines.length){
-        if(!screen.lastChild?.classList?.contains('cursor')) screen.append(cursor);
+    function tick(){
+      if (!running) return;
+
+      if (li >= LINES.length){
+        if(!screen.lastChild?.classList?.contains('cursor')) screen.appendChild(cursor);
         return;
       }
 
-      const current = lines[l];
-      const isHTML = current.indexOf("<") !== -1;
+      const line = LINES[li];
+      const hasHTML = line.indexOf('<') !== -1;
 
-      if(i === 0){
-        if(current.includes('cat projects.txt') || current.includes('cat skills_and_interests.txt') || current.includes('cat links.txt')){
-          const spacer = document.createElement('div'); spacer.className = 'gap'; screen.append(spacer);
-        }
-        lineEl = document.createElement("div");
-        screen.append(lineEl);
+      if (ci === 0){
+        addGapIfSection(line);
+        lineEl = document.createElement('div');
+        screen.appendChild(lineEl);
       }
 
-      const plain = isHTML ? current.replace(/<[^>]+>/g,'') : current;
-      lineEl.textContent = plain.slice(0, i+1);
+      const plain = hasHTML ? line.replace(/<[^>]+>/g,'') : line;
+      lineEl.textContent = plain.slice(0, ci + 1);
 
-      if(cursor.parentNode !== screen) screen.append(cursor);
+      if (cursor.parentNode !== screen) screen.appendChild(cursor);
 
-      i++;
+      ci++;
       const speed = 16 + Math.random()*34;
-      if(i < plain.length){
-        setTimeout(typeNext, speed);
-      }else{
-        if(isHTML) lineEl.innerHTML = current;
-        l++; i = 0; lineEl = null;
-        setTimeout(typeNext, 280);
+      if (ci < plain.length){
+        setTimeout(tick, speed);
+      } else {
+        // swap to HTML once line finishes
+        if (hasHTML) lineEl.innerHTML = line;
+        li++; ci = 0; lineEl = null;
+        setTimeout(tick, 260);
       }
     }
-    typeNext();
+    tick();
   </script>
 </body>
 </html>
