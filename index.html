@@ -6,15 +6,27 @@
   <title>SAYAK DUTTA</title>
   <meta name="description" content="Sayak Dutta — AI/ML Engineer. I build LLM agents, reliable RAG, and real-time analytics pipelines." />
   <style>
+    /* ========= THEME TOKENS ========= */
     :root{
-      --bg:#000; --fg:#e6edf3; --muted:#8b949e; --green:#22c55e; --link:#58a6ff; --accent:#ffd166;
-      --maxw:940px;
+      --bg:#000; --fg:#e6edf3; --muted:#8b949e;
+      --green:#22c55e; --blue:#58a6ff; --cyan:#79c0ff; --orange:#ffbc6f; --pink:#ff8bd1;
+      --section-gap:22px;
+      --font: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
     }
+    [data-theme="light"]{
+      --bg:#fff; --fg:#0b0c0f; --muted:#66707b;
+      --green:#0fa968; --blue:#1f6feb; --cyan:#0ea5e9; --orange:#d97706; --pink:#db2777;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#fff; --fg:#0b0c0f; --muted:#66707b; --green:#0fa968; --blue:#1f6feb; --cyan:#0ea5e9; --orange:#d97706; --pink:#db2777; }
+    }
+
+    /* ========= BASE ========= */
     *{ box-sizing:border-box }
     html,body{ height:100% }
     body{
       margin:0; background:var(--bg); color:var(--fg);
-      font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+      font:16px/1.6 var(--font);
       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
     }
     .wrap{
@@ -22,97 +34,142 @@
       display:grid; place-items:start center;
       padding:28px 16px 56px;
     }
-    .terminal{
-      width:100%; max-width:var(--maxw);
+    .term{
+      width:100%; max-width:940px;
     }
-    h1{ margin:0 0 14px; letter-spacing:.06em }
+    h1{ margin:0 0 12px; letter-spacing:.06em }
+
     #screen{ margin:0; white-space:pre-wrap }
     .prompt{ color:var(--green) }
     .path{ color:var(--muted) }
-    a{ color:var(--link); text-decoration:none; border-bottom:1px dotted currentColor }
+    .cmd   { color:var(--cyan) }
+    a{ color:var(--blue); text-decoration:none; border-bottom:1px dotted currentColor }
     a:hover{ border-bottom-style:solid }
+
+    /* spacing blocks like the reference site */
+    .gap{ height:var(--section-gap) }
+
+    /* cursor */
     .cursor{
       display:inline-block; width:.6ch; height:1.15em; vertical-align:-0.15em;
       background:var(--fg); margin-left:2px; animation:blink 1s steps(1,end) infinite;
     }
     @keyframes blink{ 50%{ opacity:0 } }
-    .folder{ color:var(--accent) }
+
+    /* top-right toggle */
+    .tog{
+      position:fixed; top:16px; right:16px;
+      border:1px solid currentColor; border-radius:10px;
+      font:14px var(--font); padding:6px 10px; background:transparent; color:var(--fg);
+      cursor:pointer; opacity:.8;
+    }
+    .tog:hover{ opacity:1 }
+
     @media (max-width:560px){ body{ font-size:15px } }
   </style>
 </head>
 <body>
+  <button id="themeToggle" class="tog" aria-label="Toggle theme">☀️/🌙</button>
+
   <main class="wrap">
-    <section class="terminal" aria-label="Terminal window">
+    <section class="term" aria-label="Terminal">
       <h1>SAYAK DUTTA</h1>
       <pre id="screen" aria-live="polite" aria-atomic="false"></pre>
     </section>
   </main>
 
   <script>
-    // ---- Content ----
+    // ========== THEME TOGGLE ==========
+    const root = document.documentElement;
+    const btn  = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    if(stored) root.setAttribute('data-theme', stored);
+    btn.textContent = root.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
+    btn.onclick = () => {
+      const cur = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      if(cur === 'dark') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', cur);
+      btn.textContent = cur === 'light' ? '🌙' : '☀️';
+    };
+
+    // ========== CONTENT ==========
+    // Distinct emojis per project; generous blank lines to create the same "section gaps"
     const lines = [
-      `<span class="prompt">sayak@site</span>:<span class="path">~</span>$ cat about_me.txt`,
+      `<span class="prompt">sayak:~$</span> <span class="cmd">cat about_me.txt</span>`,
       `AI/ML Engineer. I build LLM agents, reliable RAG, and real-time analytics pipelines.`,
       `I ship production code with clear evals, tracing, and fast feedback loops.`,
       ``,
+      ``,
 
-      `<span class="prompt">sayak@site</span>:<span class="path">~/highlights</span>$ ls -l`,
-      `<span class="folder">📁</span> ResearchRAG    → AI paper digester + semantic search with chunking, reranking, grounded answers`,
+      `<span class="prompt">sayak:~$</span> <span class="cmd">cat projects.txt</span>`,
+      `🔬 ResearchRAG → AI paper digester + semantic search with chunking, reranking, grounded answers`,
       `   Stack: Python • PyTorch • FAISS • FastAPI • Postgres • Docker`,
       `   Code: <a href="https://github.com/SayakDut/ResearchRAG" target="_blank" rel="noopener">github.com/SayakDut/ResearchRAG</a>`,
       ``,
-      `<span class="folder">📁</span> OutreachPilot  → Autopilot for cold outreach (variants, A/B tests, pixel+redirect tracking)`,
+      `📡 OutreachPilot → Autopilot for cold outreach (variants, A/B tests, pixel+redirect tracking)`,
       `   Stack: Docker • Postgres • FastAPI • React`,
       `   Code: <a href="https://github.com/SayakDut/OutreachPilot" target="_blank" rel="noopener">github.com/SayakDut/OutreachPilot</a>`,
       ``,
-      `<span class="folder">📁</span> AskPostgres    → Q&A over Postgres schemas with SQL generation, execution, and guardrails`,
+      `🗄️ AskPostgres   → Q&A over Postgres schemas with SQL generation, execution, and guardrails`,
       `   Stack: Python • SQL • LangChain/LlamaIndex • FastAPI`,
       `   Code: <a href="https://github.com/SayakDut/AskPostgres" target="_blank" rel="noopener">github.com/SayakDut/AskPostgres</a>`,
       ``,
-      `<span class="folder">📁</span> TalkToTube     → Summarizes YouTube via transcript/ASR and lets you query the content`,
+      `🎥 TalkToTube    → Summarizes YouTube via transcript/ASR and lets you query the content`,
       `   Stack: yt-dlp • Whisper • BART • Streamlit`,
       `   Code: <a href="https://github.com/SayakDut/TalkToTube" target="_blank" rel="noopener">github.com/SayakDut/TalkToTube</a>`,
       ``,
-
-      `<span class="prompt">sayak@site</span>:<span class="path">~/cred</span>$ cat notes.txt`,
-      `HackaTUM 2023 participant`,
-      `Python • Rust/C++ • Linux • Docker • CI/CD • CUDA (basics)`,
-      `Retrieval & embeddings • Vector DBs • Agent orchestration • NLP`,
       ``,
 
-      `<span class="prompt">sayak@site</span>:<span class="path">~/links</span>$ open links.html`,
+      `<span class="prompt">sayak:~$</span> <span class="cmd">cat skills_and_interests.txt</span>`,
+      `Skills: Python | SQL | Docker | PyTorch | GCP | NLP | ML | CI/CD | FastAPI`,
+      `Interests: 👨‍🍳 Cooking | ✈️ Travel | 📷 Photography | 🏸 Badminton | 🏓 Table Tennis`,
+      ``,
+      ``,
+
+      `<span class="prompt">sayak:~$</span> <span class="cmd">cat links.txt</span>`,
       `GitHub   → <a href="https://github.com/SayakDut" target="_blank" rel="noopener">github.com/SayakDut</a>`,
       `LinkedIn → <a href="https://www.linkedin.com/in/sayak-dutta" target="_blank" rel="noopener">linkedin.com/in/sayak-dutta</a>`,
       ``,
+      ``,
 
-      `<span class="prompt">sayak@site</span>:<span class="path">~/now</span>$ echo "shipping"`,
-      `latest → agentic workflows with evals, tracing, and autoscaling retrieval`
+      `<span class="prompt">sayak:~$</span> <span class="cmd">cat achievements.txt</span>`,
+      `🏁 HackaTUM 2023 participant`,
+      ``,
+      ``,
+
+      `<span class="prompt">sayak:~$</span> <span class="cmd">exit</span>`
     ];
 
-    // ---- Typewriter (fast & minimal reflow) ----
+    // ========== TYPEWRITER (fast & minimal reflow) ==========
     const screen = document.getElementById("screen");
     const cursor = document.createElement("span"); cursor.className = "cursor";
     let l = 0, i = 0, lineEl = null;
 
     function typeNext(){
-      if(l >= lines.length){ if(!screen.lastChild || !screen.lastChild.classList || !screen.lastChild.classList.contains('cursor')) screen.append(cursor); return; }
-
+      if(l >= lines.length){
+        if(!screen.lastChild || !screen.lastChild.classList || !screen.lastChild.classList.contains('cursor')) screen.append(cursor);
+        return;
+      }
       const current = lines[l];
       const isHTML = current.indexOf("<") !== -1;
 
       if(i === 0){
+        // Insert a "gap" element before certain sections to mimic the reference spacing
+        if(current.includes('cat projects.txt') || current.includes('cat skills_and_interests.txt') || current.includes('cat links.txt') || current.includes('cat achievements.txt')){
+          const spacer = document.createElement('div'); spacer.className = 'gap'; screen.append(spacer);
+        }
         lineEl = document.createElement("div");
         screen.append(lineEl);
       }
 
-      // For performance, only write text while typing; swap to HTML once done
+      // Type as plaintext, then swap to HTML when done (avoids layout thrash)
       const plain = isHTML ? current.replace(/<[^>]+>/g,'') : current;
       lineEl.textContent = plain.slice(0, i+1);
 
       if(cursor.parentNode !== screen) screen.append(cursor);
 
       i++;
-      const speed = 16 + Math.random()*34; // average ~33ms per char
+      const speed = 16 + Math.random()*34; // ~fast, readable
       if(i < plain.length){
         setTimeout(typeNext, speed);
       }else{
