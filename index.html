@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sayak Dutta — AI/ML Engineer</title>
+  <meta name="description" content="Sayak Dutta — AI/ML Engineer building LLM agents, RAG systems, and real-time analytics pipelines." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>λ</text></svg>">
+  <style>
+    :root{
+      --bg:#0b0c0f; --fg:#e6edf3; --muted:#9aa4ae; --green:#00d084; --blue:#6ea8ff; --line:#23262b; --maxw:940px;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#ffffff; --fg:#0b0c0f; --muted:#66707b; --green:#0ca678; --blue:#1f6feb; --line:#d0d7de; }
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font:16px/1.6 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    }
+    .wrap{
+      min-height:100%;
+      display:grid; place-items:start center;
+      padding:6vh 6vw;
+    }
+    .terminal{
+      width:100%; max-width:var(--maxw);
+      border-radius:14px; background:#00000088; backdrop-filter:saturate(1.05) blur(4px);
+      border:1px solid var(--line); padding:22px;
+      box-shadow:0 10px 30px #00000055;
+    }
+    .title{ font-weight:700; letter-spacing:.04em; margin:0 0 10px; }
+    .prompt{ color:var(--green) }
+    .path{ color:var(--muted) }
+    a{ color:var(--blue); text-decoration:none; border-bottom:1px dotted currentColor }
+    a:hover{ border-bottom-style:solid }
+    .cursor{
+      display:inline-block; width:.6ch; height:1.1em; vertical-align:-0.15em;
+      background:var(--fg); margin-left:2px; animation:blink 1s steps(1,end) infinite;
+    }
+    @keyframes blink{ 50%{ opacity:0 } }
+    @media (max-width:600px){
+      .terminal{ padding:18px }
+      .title{ font-size:16px }
+    }
+    footer{
+      max-width:var(--maxw); width:100%; margin:18px auto 0; color:var(--muted);
+      font-size:12px; text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="terminal" aria-label="Terminal window">
+      <h1 class="title">SAYAK DUTTA</h1>
+      <pre id="screen" aria-live="polite" aria-atomic="false"></pre>
+    </section>
+    <footer>© <span id="y"></span> Sayak Dutta • <a href="mailto:sduttan598@gmail.com">sduttan598@gmail.com</a></footer>
+  </main>
+
+  <script>
+    // --- Edit only the content below to update your page ---
+    const lines = [
+      `<span class="prompt">sayak@site</span>:<span class="path">~/about</span>$ cat profile.txt`,
+      `AI/ML Engineer — I build LLM agents, solid RAG, and real-time analytics pipelines.`,
+      ``,
+      `<span class="prompt">sayak@site</span>:<span class="path">~/projects</span>$ ls -l`,
+      `📂 OutreachPilot    → Agent that generates, A/B tests, and optimizes outreach automatically`,
+      `📂 ResearchRAG      → Paste a paper link → key insights, pros/cons, chat grounded to source`,
+      `📂 TalkToTube       → YouTube → transcript, clean summary, and Q&A`,
+      `📂 FinSentiment     → News/filings → market sentiment & risk signals in real time`,
+      `📂 TradingPipeline  → Low-latency market data + Python analytics (Rust/C++ where it counts)`,
+      ``,
+      `<span class="prompt">sayak@site</span>:<span class="path">~/stack</span>$ cat skills.txt`,
+      `Languages: Python • Rust/C++`,
+      `Tooling: Linux • Docker • CI/CD • CUDA (basics)`,
+      `Focus: Agent orchestration • Retrieval & embeddings • Vector DBs • NLP`,
+      ``,
+      `<span class="prompt">sayak@site</span>:<span class="path">~/now</span>$ cat status.txt`,
+      `Open to: AI/ML Engineer • AI Research Engineer • LLM/Agent Engineer`,
+      `Location: London (relocation-ready) • Remote OK`,
+      `Goal: Ship useful systems with clear metrics, tight feedback loops, and clean ops`,
+      ``,
+      `<span class="prompt">sayak@site</span>:<span class="path">~/links</span>$ open links.html`,
+      `GitHub   → <a href="https://github.com/sayakdutta" target="_blank" rel="noopener">github.com/sayakdutta</a>`,
+      `LinkedIn → <a href="https://www.linkedin.com/in/sayak-dutta" target="_blank" rel="noopener">linkedin.com/in/sayak-dutta</a>`,
+      `Email    → <a href="mailto:sduttan598@gmail.com">sduttan598@gmail.com</a>`,
+    ];
+    // -------------------------------------------------------
+
+    const screen = document.getElementById("screen");
+    const cursor = document.createElement("span"); cursor.className = "cursor";
+    let l = 0, i = 0;
+
+    function typeNext(){
+      if(l >= lines.length){
+        if(!screen.lastChild?.classList?.contains('cursor')) screen.append(cursor);
+        return;
+      }
+      const current = lines[l];
+      const isHTML = /<[^>]+>/.test(current);
+      const displayText = isHTML ? current.replace(/<[^>]+>/g,'') : current;
+
+      if(i === 0){
+        const lineEl = document.createElement("div");
+        lineEl.setAttribute("data-line", l);
+        screen.append(lineEl);
+      }
+      const lineEl = screen.querySelector(`[data-line="${l}"]`);
+      lineEl.textContent = displayText.slice(0, i+1);
+
+      screen.append(cursor);
+
+      i++;
+      const base = 18, jitter = Math.random()*40;
+      if(i < displayText.length){
+        setTimeout(typeNext, base + jitter);
+      }else{
+        if(isHTML) lineEl.innerHTML = current;
+        l++; i = 0;
+        setTimeout(typeNext, 350);
+      }
+    }
+    typeNext();
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
