@@ -29,7 +29,6 @@
 
     #screen{ margin:0; white-space:pre-wrap }
     .prompt{ color:var(--green) }
-    .path{ color:var(--muted) }
     .cmd{ color:var(--cyan) }
     a{ color:var(--blue); text-decoration:none; border-bottom:1px dotted currentColor }
     a:hover{ border-bottom-style:solid }
@@ -103,15 +102,20 @@
       ``,
 
       `<span class="prompt">sayak:~$</span> <span class="cmd">cat skills_and_interests.txt</span>`,
-      `Skills: Python | SQL | Docker | PyTorch | LLMs & RAG | ML | CI/CD | FastAPI | TypeScript | Next.js`,
+      `Skills: Python | SQL | Docker | PyTorch | GCP | LLMs & RAG | ML | CI/CD | FastAPI | TypeScript | Next.js`,
       `Interests: 👨‍🍳 Cooking | ✈️ Travel | 📷 Photography | 🏸 Badminton | 🏓 Table Tennis`,
+      ``,
+      ``,
+
+      `<span class="prompt">sayak:~$</span> <span class="cmd">cat resume.txt</span>`,
+      `Resume → <a href="resume.pdf" download>Download PDF</a> | <a href="resume.pdf" target="_blank" rel="noopener">Open in new tab</a>`,
       ``,
       ``,
 
       `<span class="prompt">sayak:~$</span> <span class="cmd">cat links.txt</span>`,
       `GitHub   → <a href="https://github.com/SayakDut" target="_blank" rel="noopener">github.com/SayakDut</a>`,
       `LinkedIn → <a href="https://www.linkedin.com/in/sayak-dutta" target="_blank" rel="noopener">linkedin.com/in/sayak-dutta</a>`,
-      `<div class="gap"></div>`,  // 👈 consistent gap element
+      ``,
       ``,
 
       `<span class="prompt">sayak:~$</span> <span class="cmd">exit</span>`
@@ -123,8 +127,12 @@
     let li = 0, ci = 0, lineEl = null, running = true, timerId = null;
 
     function addGapIfSection(lineStr){
-      // only one gap before a section header block
-      if (lineStr.includes('cat projects.txt') || lineStr.includes('cat skills_and_interests.txt') || lineStr.includes('cat links.txt')) {
+      if (
+        lineStr.includes('cat projects.txt') ||
+        lineStr.includes('cat skills_and_interests.txt') ||
+        lineStr.includes('cat resume.txt') ||
+        lineStr.includes('cat links.txt')
+      ) {
         const last = screen.lastElementChild;
         if (!last || !last.classList || !last.classList.contains('gap')) {
           const gap = document.createElement('div'); gap.className = 'gap'; screen.appendChild(gap);
@@ -133,19 +141,21 @@
     }
 
     function finishLineHTML(lineStr){ if (lineEl) lineEl.innerHTML = lineStr; }
-
     function clearTimer(){ if (timerId){ clearTimeout(timerId); timerId = null; } }
 
     function flushRemaining(){
       if (!running) return;
       clearTimer();
-      // complete current line
       if (li < LINES.length) { finishLineHTML(LINES[li]); li++; }
-      // render the rest instantly with proper gaps
       const frag = document.createDocumentFragment();
       for (; li < LINES.length; li++){
         const s = LINES[li];
-        if (s.includes('cat projects.txt') || s.includes('cat skills_and_interests.txt') || s.includes('cat links.txt')) {
+        if (
+          s.includes('cat projects.txt') ||
+          s.includes('cat skills_and_interests.txt') ||
+          s.includes('cat resume.txt') ||
+          s.includes('cat links.txt')
+        ) {
           const g = document.createElement('div'); g.className = 'gap'; frag.appendChild(g);
         }
         const d = document.createElement('div'); d.innerHTML = s; frag.appendChild(d);
